@@ -5,22 +5,17 @@ import (
 	"time"
 )
 
+func AddZeroAndToString(number int) string {
+	if number < 10 {
+		return fmt.Sprintf("0%d", number)
+	}
+	return fmt.Sprintf("%d", number)
+
+}
+
 func ThisDay() string {
-	var dayString string
-	var monthString string
 	year, month, day := time.Now().Date()
-	if day < 10 {
-		dayString = fmt.Sprintf("0%d", day)
-	} else {
-		dayString = fmt.Sprintf("%d", day)
-	}
 
-	if int(month) < 10 {
-		monthString = fmt.Sprintf("0%d", int(month))
-	} else {
-		monthString = fmt.Sprintf("%d", int(month))
-	}
-
-	stringThisDay := fmt.Sprintf("%v-%s-%s", year, monthString, dayString)
+	stringThisDay := fmt.Sprintf("%v-%s-%s", year, AddZeroAndToString(int(month)), AddZeroAndToString(day))
 	return stringThisDay
 }
