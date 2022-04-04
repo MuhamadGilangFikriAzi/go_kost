@@ -8,8 +8,15 @@ import (
 
 func main() {
 	conn := manager.NewInfraManager().PostgreConn()
-	repo := repository.NewAdminRepo(conn)
+	repo := repository.NewTransactionRepo(conn)
 	//repo.GetAllAdmin()
-	repo.GetAllCustomer()
+	//repo.GetAllCustomer()
+	//repo.GetCustomerWithTransaction()
+	//repo.GetAllAvailableRoom()
+	//data := appresponse.TransactionRequest{
+	//	"asidnlnasiufbqowmuqf",
+	//	"A03",
+	//}
+	repo.UpdateTransaction("asidnlnasiufbqowmuqf")
 	//defer conn.Close(context.Background())
 }

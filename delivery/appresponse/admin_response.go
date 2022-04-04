@@ -1,10 +1,11 @@
 package appresponse
 
-type CustomerResponse struct {
-	Name        string `json:"name"`
-	Address     string `json:"address"`
-	Ktp         string `db:"ktpid" json:"ktp"`
-	PhoneNumber string `db:"phone_number" json:"phone_number"`
-	StartRentAt string `db:"start_rent_at" json:"start_rent_at"`
-	EndRentAt   string `db:"end_rent_at" json:"end_rent_at"`
+import "github.com/jackc/pgtype"
+
+type CustomerLastTransactionResponse struct {
+	Name            string      `json:"customer_name"`
+	PhoneNumber     string      `json:"phone_number" db:"phone_number"`
+	RoomNumber      string      `db:"room_number" json:"room_number"`
+	LastTransaction pgtype.Date `db:"last_transaction" json:"last_transaction"`
+	Status          string
 }
