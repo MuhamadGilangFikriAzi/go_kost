@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"gokost.com/m/delivery/appresponse"
@@ -58,7 +57,6 @@ func (t *transactionRepo) GetTransactionByCustomerId(customerId string) ([]appre
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(data)
 	return data, err
 }
 

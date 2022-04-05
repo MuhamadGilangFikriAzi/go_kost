@@ -11,6 +11,7 @@ import (
 type transactionApi struct {
 	usecaseInsert usecase.InsertTransactionUseCase
 	usecaseUpdate usecase.UpdateTransactionUseCase
+	usecaseSearch usecase.CustomerTransactionUseCase
 }
 
 func (t *transactionApi) StoreTransaction() gin.HandlerFunc {
@@ -31,11 +32,50 @@ func (t *transactionApi) StoreTransaction() gin.HandlerFunc {
 	}
 }
 
-func NewTransactionApi(routerGroup *gin.RouterGroup, usecaseInsert usecase.InsertTransactionUseCase, usecaseUpdate usecase.UpdateTransactionUseCase) {
+func (t *transactionApi) UpdateTransaction() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var requestData appresponse.TransactionUpdateRequest
+		errBind := c.ShouldBindJSON(&requestData)
+		if errBind != nil {
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errBind.Error()))
+			return
+		}
+
+		err := t.usecaseUpdate.UpdateTransaction(requestData.CustomerId, requestData.Status)
+		if err != nil {
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(err.Error()))
+			return
+		}
+		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("Success update transaction", ""))
+	}
+}
+
+func (t *transactionApi) GetTransactionByCustomerId() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var requestData appresponse.TransactionUpdateRequest
+		errBind := c.ShouldBindJSON(&requestData)
+		if errBind != nil {
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errBind.Error()))
+			return
+		}
+
+		data, err := t.usecaseSearch.SearchTransactionByCustomerId(requestData.CustomerId)
+		if err != nil {
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(err.Error()))
+			return
+		}
+		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("Success get transaction by customer id", data))
+	}
+}
+
+func NewTransactionApi(routerGroup *gin.RouterGroup, usecaseInsert usecase.InsertTransactionUseCase, usecaseUpdate usecase.UpdateTransactionUseCase, usecaseSearch usecase.CustomerTransactionUseCase) {
 	api := &transactionApi{
 		usecaseInsert,
 		usecaseUpdate,
+		usecaseSearch,
 	}
 
-	routerGroup.POST("store_transaction", api.StoreTransaction())
+	routerGroup.POST("/store_transaction", api.StoreTransaction())
+	routerGroup.POST("/update_transaction", api.UpdateTransaction())
+	routerGroup.GET("/search_transaction", api.GetTransactionByCustomerId())
 }

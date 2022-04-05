@@ -28,7 +28,7 @@ func (s *serverConfig) routeGroupApi() {
 	api.NewBoardingApi(apiGroupBoardingRoom, s.UseCaseManager.AvailableRoomUseCase())
 
 	apiGroupTransaction := s.gin.Group("transaction")
-	api.NewTransactionApi(apiGroupTransaction, s.UseCaseManager.InsertTransactionUseCase(), s.UseCaseManager.UpdateCustomerUseCase())
+	api.NewTransactionApi(apiGroupTransaction, s.UseCaseManager.InsertTransactionUseCase(), s.UseCaseManager.UpdateCustomerUseCase(), s.UseCaseManager.CustomerTransactionUseCase())
 }
 
 func (s *serverConfig) Run() {

@@ -6,14 +6,14 @@ import (
 )
 
 type CustomerTransactionUseCase interface {
-	CustomerTransactionUsecase(customerId string) ([]appresponse.UserTransactionResonse, error)
+	SearchTransactionByCustomerId(customerId string) ([]appresponse.UserTransactionResonse, error)
 }
 
 type customerTransactionUseCase struct {
 	repo repository.TransactionRepo
 }
 
-func (c *customerTransactionUseCase) CustomerTransactionUsecase(customerId string) ([]appresponse.UserTransactionResonse, error) {
+func (c *customerTransactionUseCase) SearchTransactionByCustomerId(customerId string) ([]appresponse.UserTransactionResonse, error) {
 	return c.repo.GetTransactionByCustomerId(customerId)
 }
 

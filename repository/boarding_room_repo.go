@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"gokost.com/m/model"
 )
@@ -20,7 +19,6 @@ func (b *boardingRoomRepo) GetAllAvailableRoom() ([]model.BoardingRoom, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(data)
 	return data, nil
 }
 
