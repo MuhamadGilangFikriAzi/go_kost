@@ -17,7 +17,18 @@ type serverConfig struct {
 }
 
 func (s *serverConfig) initHeader() {
-	s.gin.GET("/test", api.Test())
+	s.routeGroupApi()
+}
+
+func (s *serverConfig) routeGroupApi() {
+	apiGroupCustomer := s.gin.Group("/customer")
+	api.NewCustomerApi(apiGroupCustomer, s.UseCaseManager.ListCustomerUseCase())
+
+	apiGroupBoardingRoom := s.gin.Group("boarding_room")
+	api.NewBoardingApi(apiGroupBoardingRoom, s.UseCaseManager.AvailableRoomUseCase())
+
+	apiGroupTransaction := s.gin.Group("transaction")
+	api.NewTransactionApi(apiGroupTransaction, s.UseCaseManager.InsertTransactionUseCase(), s.UseCaseManager.UpdateCustomerUseCase())
 }
 
 func (s *serverConfig) Run() {
