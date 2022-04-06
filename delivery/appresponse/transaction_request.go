@@ -6,6 +6,6 @@ type TransactionRequest struct {
 }
 
 type TransactionUpdateRequest struct {
-	CustomerId string `json:"customer_id"`
+	CustomerId string `json:"customer_id" binding:"required"`
 	Status     int    `json:"status"`
 }

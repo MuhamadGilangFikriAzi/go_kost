@@ -7,6 +7,10 @@ import (
 	"gokost.com/m/manager"
 )
 
+type AppServer interface {
+	Run()
+}
+
 type serverConfig struct {
 	gin            *gin.Engine
 	Name           string
@@ -36,7 +40,7 @@ func (s *serverConfig) Run() {
 	s.gin.Run(fmt.Sprintf("%s:%s", s.Name, s.Port))
 }
 
-func Server() *serverConfig {
+func Server() AppServer {
 	ginStart := gin.Default()
 	infra := manager.NewInfraManager()
 	repo := manager.NewRepoManager(infra.PostgreConn())

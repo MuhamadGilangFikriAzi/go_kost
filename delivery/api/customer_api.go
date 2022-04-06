@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"gokost.com/m/delivery/common_resp"
+	"gokost.com/m/delivery/logger"
 	"gokost.com/m/usecase"
 	"net/http"
 )
@@ -15,6 +16,7 @@ func (c *customerApi) GetAllCustomer() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		data, err := c.usecase.ListCustomer()
 		if err != nil {
+			logger.SendLogToDiscord("Get All Customer", err)
 			common_resp.NewCommonResp(g).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(err.Error()))
 			return
 		}
@@ -26,6 +28,7 @@ func (c *customerApi) GetAllCustomerWithTransaction() gin.HandlerFunc {
 	return func(g *gin.Context) {
 		data, err := c.usecase.ListCustomerWithTransaction()
 		if err != nil {
+			logger.SendLogToDiscord("Get All Customer with Transaction", err)
 			common_resp.NewCommonResp(g).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(err.Error()))
 			return
 		}
