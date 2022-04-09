@@ -2,8 +2,8 @@ package authenticator
 
 import (
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"gokost.com/m/delivery/appresponse"
-	"golang.org/x/oauth2/jwt"
 	"time"
 )
 

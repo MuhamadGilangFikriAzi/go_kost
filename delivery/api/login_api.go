@@ -31,8 +31,8 @@ func (l *loginApi) LoginAdmin() gin.HandlerFunc {
 			common_resp.NewCommonResp(c).FailedResp(http.StatusUnauthorized, common_resp.FailedMessage("not register"))
 			return
 		}
-
-		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("login admin", ""))
+		dataAdmin.Password = ""
+		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("login admin", dataAdmin))
 	}
 }
 

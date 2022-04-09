@@ -19,7 +19,7 @@ type serverConfig struct {
 	InfraManager   manager.InfraManager
 	RepoManager    manager.RepoManager
 	UseCaseManager manager.UseCaseManager
-	Config         config.Config
+	Config         *config.Config
 }
 
 func (s *serverConfig) initHeader() {
@@ -52,6 +52,6 @@ func Server() AppServer {
 	repo := manager.NewRepoManager(infra.PostgreConn())
 	usecase := manager.NewUseCaseManager(repo)
 	return &serverConfig{
-		ginStart, "localhost", "8000", infra, repo, usecase, config
+		ginStart, "localhost", "8000", infra, repo, usecase, config,
 	}
 }
