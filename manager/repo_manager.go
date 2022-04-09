@@ -9,6 +9,7 @@ type RepoManager interface {
 	TransactionRepo() repository.TransactionRepo
 	BoardingRoomRepo() repository.BoardingRoomRepo
 	CustomerRepo() repository.CustomerRepo
+	AdminRepo() repository.AdminRepo
 }
 
 type repoManager struct {
@@ -25,6 +26,10 @@ func (r *repoManager) BoardingRoomRepo() repository.BoardingRoomRepo {
 
 func (r *repoManager) CustomerRepo() repository.CustomerRepo {
 	return repository.NewCustomerRepo(r.SqlxDb)
+}
+
+func (r *repoManager) AdminRepo() repository.AdminRepo {
+	return repository.NewAdminRepo(r.SqlxDb)
 }
 
 func NewRepoManager(sqlxDb *sqlx.DB) RepoManager {

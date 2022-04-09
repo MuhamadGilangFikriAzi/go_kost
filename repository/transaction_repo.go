@@ -3,13 +3,14 @@ package repository
 import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"gokost.com/m/delivery/apprequest"
 	"gokost.com/m/delivery/appresponse"
 	"gokost.com/m/model"
 	"gokost.com/m/utility"
 )
 
 type TransactionRepo interface {
-	InsertTransaction(dataTransaction appresponse.TransactionRequest) error
+	InsertTransaction(dataTransaction apprequest.TransactionRequest) error
 	UpdateTransaction(customer_id string, status int) error
 	GetTransactionByCustomerId(customerId string) ([]appresponse.UserTransactionResonse, error)
 }
@@ -18,7 +19,7 @@ type transactionRepo struct {
 	sqlxDb *sqlx.DB
 }
 
-func (t *transactionRepo) InsertTransaction(dataTransaction appresponse.TransactionRequest) error {
+func (t *transactionRepo) InsertTransaction(dataTransaction apprequest.TransactionRequest) error {
 	uuid := uuid.New().String()
 	adminId := "olsdinoinqw"
 	thisDay := utility.ThisDay()

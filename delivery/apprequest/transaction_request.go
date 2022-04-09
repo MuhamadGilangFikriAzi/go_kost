@@ -1,4 +1,4 @@
-package appresponse
+package apprequest
 
 type TransactionRequest struct {
 	CustomerId string `json:"customer_id"`

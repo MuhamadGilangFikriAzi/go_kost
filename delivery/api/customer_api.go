@@ -14,6 +14,7 @@ type customerApi struct {
 
 func (c *customerApi) GetAllCustomer() gin.HandlerFunc {
 	return func(g *gin.Context) {
+
 		data, err := c.usecase.ListCustomer()
 		if err != nil {
 			logger.SendLogToDiscord("Get All Customer", err)

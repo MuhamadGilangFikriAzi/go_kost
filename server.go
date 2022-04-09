@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"gokost.com/m/config"
 	"gokost.com/m/delivery/api"
 	"gokost.com/m/manager"
 )
@@ -18,6 +19,7 @@ type serverConfig struct {
 	InfraManager   manager.InfraManager
 	RepoManager    manager.RepoManager
 	UseCaseManager manager.UseCaseManager
+	Config         config.Config
 }
 
 func (s *serverConfig) initHeader() {
@@ -33,6 +35,9 @@ func (s *serverConfig) routeGroupApi() {
 
 	apiGroupTransaction := s.gin.Group("transaction")
 	api.NewTransactionApi(apiGroupTransaction, s.UseCaseManager.InsertTransactionUseCase(), s.UseCaseManager.UpdateCustomerUseCase(), s.UseCaseManager.CustomerTransactionUseCase())
+
+	apiLogin := s.gin.Group("login")
+	api.NewLoginApi(apiLogin, s.UseCaseManager.LoginAdminUseCase())
 }
 
 func (s *serverConfig) Run() {
@@ -42,10 +47,11 @@ func (s *serverConfig) Run() {
 
 func Server() AppServer {
 	ginStart := gin.Default()
-	infra := manager.NewInfraManager()
+	config := config.NewConfig()
+	infra := manager.NewInfraManager(config.PostgreConn())
 	repo := manager.NewRepoManager(infra.PostgreConn())
 	usecase := manager.NewUseCaseManager(repo)
 	return &serverConfig{
-		ginStart, "localhost", "8000", infra, repo, usecase,
+		ginStart, "localhost", "8000", infra, repo, usecase, config
 	}
 }

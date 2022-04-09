@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"gokost.com/m/delivery/appresponse"
+	"gokost.com/m/delivery/apprequest"
 	"gokost.com/m/delivery/common_resp"
 	"gokost.com/m/delivery/logger"
 	"gokost.com/m/usecase"
@@ -17,7 +17,7 @@ type transactionApi struct {
 
 func (t *transactionApi) StoreTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData appresponse.TransactionRequest
+		var requestData apprequest.TransactionRequest
 		errBind := c.ShouldBindJSON(&requestData)
 		if errBind != nil {
 			logger.SendLogToDiscord("Insert Transaction", errBind)
@@ -37,7 +37,7 @@ func (t *transactionApi) StoreTransaction() gin.HandlerFunc {
 
 func (t *transactionApi) UpdateTransaction() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData appresponse.TransactionUpdateRequest
+		var requestData apprequest.TransactionUpdateRequest
 		errBind := c.ShouldBindJSON(&requestData)
 		if errBind != nil {
 			logger.SendLogToDiscord("Update Transaction", errBind)
@@ -57,7 +57,7 @@ func (t *transactionApi) UpdateTransaction() gin.HandlerFunc {
 
 func (t *transactionApi) GetTransactionByCustomerId() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var requestData appresponse.TransactionUpdateRequest
+		var requestData apprequest.TransactionUpdateRequest
 		errBind := c.ShouldBindJSON(&requestData)
 		if errBind != nil {
 			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errBind.Error()))

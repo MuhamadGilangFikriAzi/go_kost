@@ -5,8 +5,8 @@ import (
 	"github.com/gtuk/discordwebhook"
 	"github.com/rs/zerolog"
 	"gokost.com/m/config"
+	"gokost.com/m/utility"
 	"os"
-	"time"
 )
 
 var (
@@ -26,8 +26,8 @@ func SendLogToDiscord(serve string, errSend error) {
 	var username = config.GetConfigValue("DISCORD_USERNAME")
 	var url = config.GetConfigValue("DISCORD_WEBHOOK_URL")
 
-	currentTime := time.Now().Format("2006-01-02 15:04:05")
-	content := fmt.Sprintf("(%s) Serve: %s, Error: %s", currentTime, serve, errSend.Error())
+	currentTime := utility.ThisTimeStamp()
+	content := fmt.Sprintf("(%s)\n Serve: %s\n Error: %s", currentTime, serve, errSend.Error())
 	message := discordwebhook.Message{
 		Username: &username,
 		Content:  &content,

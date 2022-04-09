@@ -1,8 +1,9 @@
 package manager
 
 import (
+	"fmt"
 	"github.com/jmoiron/sqlx"
-	"gokost.com/m/config"
+	"os"
 )
 
 type InfraManager interface {
@@ -17,8 +18,13 @@ func (i *infraManager) PostgreConn() *sqlx.DB {
 	return i.postgreConn
 }
 
-func NewInfraManager() InfraManager {
+func NewInfraManager(urlPostgresql string) InfraManager {
+	conn, err := sqlx.Connect("pgx", urlPostgresql)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
 	return &infraManager{
-		postgreConn: config.NewConfig().PostgreConn(),
+		postgreConn: conn,
 	}
 }
