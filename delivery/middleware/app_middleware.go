@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"WMB/logger"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jmoiron/sqlx"
+	"gokost.com/m/delivery/logger"
 	"time"
 )
 
@@ -26,11 +26,11 @@ func AuthUser(requiredToken string, sqlxdb *sqlx.DB) bool {
 	var countAuthUser int
 	err := sqlxdb.Get(&countAuthUser, "select count(*) from users where token = $1", requiredToken)
 	if err != nil {
-		logger.Log.Err(err).Msg("Database not conected")
+		logger.SendLogToDiscord("Auth User", err)
 		panic("database not connected")
 	}
 	if countAuthUser == 0 {
-		logger.Log.Err(err).Msg("Token Auth not found")
+		logger.SendLogToDiscord("Token Auth Not Found", err)
 		return true
 	}
 	return false

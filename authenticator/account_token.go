@@ -10,6 +10,7 @@ import (
 type Token interface {
 	CreateToken(dataLogin appresponse.LoginResponse) (string, error)
 	VerifAccessToken(tokenString string) (jwt.MapClaims, error)
+	GetAppName() string
 }
 
 type TokenConfig struct {
@@ -21,6 +22,10 @@ type TokenConfig struct {
 
 type token struct {
 	config TokenConfig
+}
+
+func (t *token) GetAppName() string {
+	return t.config.AplicationName
 }
 
 func (t *token) CreateToken(dataLogin appresponse.LoginResponse) (string, error) {

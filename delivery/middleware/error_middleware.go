@@ -1,11 +1,9 @@
 package middleware
 
 import (
-	"WMB/delivery/commonresp"
-	"WMB/logger"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"gokost.com/m/delivery/common_resp"
 	"net/http"
 )
 
@@ -17,20 +15,18 @@ func ErrorMiddleware() gin.HandlerFunc {
 			return
 		}
 		e := detectedError.Error()
-		errResp := commonresp.ErrorMessage{}
+		errResp := common_resp.ErrorResponse{}
 		err := json.Unmarshal([]byte(e), &errResp)
 		if err != nil {
-			errResp.HttpCode = http.StatusInternalServerError
-			errResp.ErrorDescription = commonresp.ErrorDescription{
-				Status:       "Error",
-				ResponseCode: "06",
-				Description:  "Convert Json Failed",
-			}
-			logger.Log.Error().Err(err).Msg(errResp.Description)
+
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage("Convert Json Failed"))
+			return
 		} else {
-			logger.Log.Error().Err(fmt.Errorf("%d", errResp.HttpCode)).Str("Service", errResp.Service).Str("Code", errResp.ResponseCode).Msg(errResp.Description)
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errResp.Message))
+			return
 		}
 
-		commonresp.NewJsonResponse(c).SendError(errResp)
+		common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errResp.Message))
+		return
 	}
 }

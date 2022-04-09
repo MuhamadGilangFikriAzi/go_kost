@@ -1,18 +1,17 @@
 package middleware
 
 import (
-	"WMB/authenticator"
-	"WMB/delivery/api"
 	"github.com/gin-gonic/gin"
+	authenticator2 "gokost.com/m/authenticator"
 	"net/http"
 	"strings"
 )
 
 type AuthTokenMiddleware struct {
-	acctToken authenticator.Token
+	acctToken authenticator2.Token
 }
 
-func NewAuthTokenMiddleware(configToken authenticator.Token) *AuthTokenMiddleware {
+func NewAuthTokenMiddleware(configToken authenticator2.Token) *AuthTokenMiddleware {
 	return &AuthTokenMiddleware{
 		acctToken: configToken,
 	}
@@ -53,7 +52,7 @@ func (a *AuthTokenMiddleware) TokenAuthMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			if token["iss"] == api.AplicationName {
+			if token["iss"] == a.acctToken.GetAppName() {
 				c.Next()
 			} else {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

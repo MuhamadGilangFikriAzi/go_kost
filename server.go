@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gokost.com/m/config"
 	"gokost.com/m/delivery/api"
+	"gokost.com/m/delivery/middleware"
 	"gokost.com/m/manager"
 )
 
@@ -20,9 +21,11 @@ type serverConfig struct {
 	RepoManager    manager.RepoManager
 	UseCaseManager manager.UseCaseManager
 	Config         *config.Config
+	Middleware     *middleware.AuthTokenMiddleware
 }
 
 func (s *serverConfig) initHeader() {
+	s.gin.Use(s.Middleware.TokenAuthMiddleware())
 	s.routeGroupApi()
 }
 
@@ -37,7 +40,7 @@ func (s *serverConfig) routeGroupApi() {
 	api.NewTransactionApi(apiGroupTransaction, s.UseCaseManager.InsertTransactionUseCase(), s.UseCaseManager.UpdateCustomerUseCase(), s.UseCaseManager.CustomerTransactionUseCase())
 
 	apiLogin := s.gin.Group("login")
-	api.NewLoginApi(apiLogin, s.UseCaseManager.LoginAdminUseCase())
+	api.NewLoginApi(apiLogin, s.UseCaseManager.LoginAdminUseCase(), s.Config.ConfigToken)
 }
 
 func (s *serverConfig) Run() {
@@ -51,7 +54,15 @@ func Server() AppServer {
 	infra := manager.NewInfraManager(config.PostgreConn())
 	repo := manager.NewRepoManager(infra.PostgreConn())
 	usecase := manager.NewUseCaseManager(repo)
+	middleware := middleware.NewAuthTokenMiddleware(config.ConfigToken)
 	return &serverConfig{
-		ginStart, "localhost", "8000", infra, repo, usecase, config,
+		ginStart,
+		"localhost",
+		"8000",
+		infra,
+		repo,
+		usecase,
+		config,
+		middleware,
 	}
 }

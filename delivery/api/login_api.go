@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"gokost.com/m/authenticator"
 	"gokost.com/m/delivery/apprequest"
 	"gokost.com/m/delivery/common_resp"
 	"gokost.com/m/delivery/logger"
@@ -10,7 +11,8 @@ import (
 )
 
 type loginApi struct {
-	usecase usecase.LoginAdminUsecase
+	usecase     usecase.LoginAdminUsecase
+	configToken authenticator.Token
 }
 
 func (l *loginApi) LoginAdmin() gin.HandlerFunc {
@@ -31,14 +33,23 @@ func (l *loginApi) LoginAdmin() gin.HandlerFunc {
 			common_resp.NewCommonResp(c).FailedResp(http.StatusUnauthorized, common_resp.FailedMessage("not register"))
 			return
 		}
+		tokenString, errToken := l.configToken.CreateToken(dataAdmin)
+		if errToken != nil {
+			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage("Token Failed"))
+			return
+		}
 		dataAdmin.Password = ""
-		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("login admin", dataAdmin))
+		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("login admin", gin.H{
+			"data_admin": dataAdmin,
+			"token":      tokenString,
+		}))
 	}
 }
 
-func NewLoginApi(routeGroup *gin.RouterGroup, adminUsecase usecase.LoginAdminUsecase) {
+func NewLoginApi(routeGroup *gin.RouterGroup, adminUsecase usecase.LoginAdminUsecase, configToken authenticator.Token) {
 	api := &loginApi{
 		adminUsecase,
+		configToken,
 	}
 
 	routeGroup.POST("/admin", api.LoginAdmin())
