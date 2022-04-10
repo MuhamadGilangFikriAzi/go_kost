@@ -19,7 +19,7 @@ func NewAuthTokenMiddleware(configToken authenticator2.Token) *AuthTokenMiddlewa
 
 func (a *AuthTokenMiddleware) TokenAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.URL.Path == "/login" {
+		if c.Request.URL.Path == "/login/admin" {
 			c.Next()
 		} else {
 			h := authHeader{}
@@ -47,7 +47,7 @@ func (a *AuthTokenMiddleware) TokenAuthMiddleware() gin.HandlerFunc {
 			token, errToken := a.acctToken.VerifAccessToken(tokenString)
 			if errToken != nil {
 				c.JSON(http.StatusUnauthorized, gin.H{
-					"message": errToken,
+					"message": errToken.Error(),
 				})
 				c.Abort()
 				return
