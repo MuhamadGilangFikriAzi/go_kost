@@ -25,11 +25,15 @@ type serverConfig struct {
 }
 
 func (s *serverConfig) initHeader() {
+	apiTesting := s.gin.Group("/testing")
+	api.NewTestingApi(apiTesting)
+
 	s.gin.Use(s.Middleware.TokenAuthMiddleware())
 	s.routeGroupApi()
 }
 
 func (s *serverConfig) routeGroupApi() {
+
 	apiGroupCustomer := s.gin.Group("/customer")
 	api.NewCustomerApi(apiGroupCustomer, s.UseCaseManager.ListCustomerUseCase())
 

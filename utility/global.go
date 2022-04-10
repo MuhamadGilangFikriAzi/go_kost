@@ -3,6 +3,7 @@ package utility
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 )
 
@@ -23,6 +24,20 @@ func ThisDay() string {
 
 func ThisTimeStamp() string {
 	return time.Now().Format("2006-01-02 15:04:05")
+}
+
+func ThisTimeStampCode() string {
+	time := time.Now().Format("2006-01-02 15:04:05")
+	stringReplace := strings.Replace(time, "-", "", -1)
+	stringReplace = strings.Replace(stringReplace, ":", "", -1)
+	stringReplace = strings.Replace(stringReplace, " ", "", -1)
+	return stringReplace
+}
+
+func CreateNameFile(name string) string {
+	extension := strings.Split(name, ".")
+	fileName := fmt.Sprintf("%s.%s", ThisTimeStampCode(), extension[len(extension)-1])
+	return fileName
 }
 
 func HashPassword(password string) (string, error) {
