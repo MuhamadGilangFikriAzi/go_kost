@@ -14,7 +14,7 @@ import (
 type testingApi struct {
 }
 
-func (t *testingApi) Testing() gin.HandlerFunc {
+func (t *testingApi) UploadFile() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		file, header, err := c.Request.FormFile("file") // key dari form file adalah nama param dari file
 		if err != nil {
@@ -23,8 +23,8 @@ func (t *testingApi) Testing() gin.HandlerFunc {
 			return
 		}
 
-		fileName := utility.CreateNameFile(header.Filename)
-		out, errOut := os.Create("files/" + fileName)
+		fileName := utility.CreateNameFile(header.Filename) // membuat nama file baru
+		out, errOut := os.Create("files/" + fileName)       //`membuat file dengan nama yg sudah ditentukan
 		if errOut != nil {
 			logger.SendLogToDiscord("Create upload file", errOut)
 			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage(errOut.Error()))
@@ -47,5 +47,5 @@ func (t *testingApi) Testing() gin.HandlerFunc {
 func NewTestingApi(routerGroup *gin.RouterGroup) {
 	api := &testingApi{}
 
-	routerGroup.POST("", api.Testing())
+	routerGroup.POST("/uploadfile", api.UploadFile())
 }

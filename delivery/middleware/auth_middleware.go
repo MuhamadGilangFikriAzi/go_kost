@@ -19,7 +19,7 @@ func NewAuthTokenMiddleware(configToken authenticator2.Token) *AuthTokenMiddlewa
 
 func (a *AuthTokenMiddleware) TokenAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.URL.Path == "/login/admin" {
+		if c.Request.URL.Path == "/login/admin" || strings.Contains(c.Request.URL.Path, "/files") {
 			c.Next()
 		} else {
 			h := authHeader{}
