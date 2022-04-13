@@ -25,14 +25,16 @@ type serverConfig struct {
 }
 
 func (s *serverConfig) initHeader() {
-	apiTesting := s.gin.Group("/testing")
-	api.NewTestingApi(apiTesting)
-
 	s.gin.Use(s.Middleware.TokenAuthMiddleware())
 	s.routeGroupApi()
 }
 
 func (s *serverConfig) routeGroupApi() {
+	apiTesting := s.gin.Group("/testing")
+	api.NewTestingApi(apiTesting)
+
+	apiProduct := s.gin.Group("/product")
+	api.NewProductApo(apiProduct, s.UseCaseManager.AllProductUseCase())
 
 	apiGroupCustomer := s.gin.Group("/customer")
 	api.NewCustomerApi(apiGroupCustomer, s.UseCaseManager.ListCustomerUseCase())
@@ -55,8 +57,8 @@ func (s *serverConfig) Run() {
 func Server() AppServer {
 	ginStart := gin.Default()
 	config := config.NewConfig()
-	infra := manager.NewInfraManager(config.PostgreConn())
-	repo := manager.NewRepoManager(infra.PostgreConn())
+	infra := manager.NewInfraManager(config.PostgreConn(), config.MysqlConn())
+	repo := manager.NewRepoManager(infra.PostgreConn(), infra.MysqlConn())
 	usecase := manager.NewUseCaseManager(repo)
 	middleware := middleware.NewAuthTokenMiddleware(config.ConfigToken)
 	return &serverConfig{

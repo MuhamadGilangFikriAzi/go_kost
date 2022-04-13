@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	dbConn      string
+	mysqlConn   string
 	ConfigToken authenticator.Token
 }
 
@@ -22,6 +23,11 @@ func newTokenConfig() authenticator.Token {
 	}
 	return authenticator.NewToken(tokenConfig)
 }
+
+func (c *Config) MysqlConn() string {
+	return c.mysqlConn
+}
+
 func (c *Config) PostgreConn() string {
 	return c.dbConn
 }
@@ -54,9 +60,20 @@ func newPostgreConn() string {
 	return urlDb
 }
 
+func newMysqlConn() string {
+	dbUser := GetConfigValue("MYSQLUSER")
+	dbPass := GetConfigValue("MYSQLPASS")
+	dbUrl := GetConfigValue("MYSQLURL")
+	dbPort := GetConfigValue("MYSQLPORT")
+	dbName := GetConfigValue("MYSQLDBNAME")
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbUrl, dbPort, dbName)
+	return dsn
+}
+
 func NewConfig() *Config {
 	return &Config{
 		dbConn:      newPostgreConn(),
 		ConfigToken: newTokenConfig(),
+		mysqlConn:   newMysqlConn(),
 	}
 }
