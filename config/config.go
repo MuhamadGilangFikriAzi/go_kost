@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	ConfigToken  authenticator.Token
+	ConfigToken  authenticator.TokenConfig
 	ConfigServer *ConfigServer
 	*ConfigDatabase
 }
@@ -31,14 +31,14 @@ type ConfigRedis struct {
 	Db       int
 }
 
-func newTokenConfig() authenticator.Token {
-	tokenConfig := authenticator.TokenConfig{
-		AplicationName:      "Warung Makan Bahari",
-		JwtSignatureKey:     "P@ssw0rd",
+func newTokenConfig() authenticator.TokenConfig {
+	//duration, _ := strconv.Atoi(GetConfigValue("JWTDURATION"))
+	return authenticator.TokenConfig{
+		AplicationName:      GetConfigValue("APLICATIONNAME"),
+		JwtSignatureKey:     GetConfigValue("JWTKEY"),
 		JwtSignatureMethod:  jwt.SigningMethodHS256,
-		AccessTokenDuration: 600 * time.Second,
+		AccessTokenDuration: 60 * time.Minute,
 	}
-	return authenticator.NewToken(tokenConfig)
 }
 
 func newServerConfig() *ConfigServer {

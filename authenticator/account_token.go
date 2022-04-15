@@ -1,8 +1,10 @@
 package authenticator
 
 import (
+	"context"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/go-redis/redis/v8"
 	"gokost.com/m/delivery/appresponse"
 	"time"
 )
@@ -11,6 +13,8 @@ type Token interface {
 	CreateToken(dataLogin appresponse.LoginResponse) (string, error)
 	VerifAccessToken(tokenString string) (jwt.MapClaims, error)
 	GetAppName() string
+	CheckTokenAvailable(tokenString string) (bool, error)
+	UpdateToken(tokenString string)
 }
 
 type TokenConfig struct {
@@ -22,16 +26,19 @@ type TokenConfig struct {
 
 type token struct {
 	config TokenConfig
+	rdb    *redis.Client
+	ctx    context.Context
 }
 
 func (t *token) GetAppName() string {
 	return t.config.AplicationName
 }
 
+func (t *token) UpdateToken(tokenString string) {
+	t.rdb.Set(t.ctx, "token", tokenString, t.config.AccessTokenDuration)
+}
+
 func (t *token) CreateToken(dataLogin appresponse.LoginResponse) (string, error) {
-	now := time.Now().UTC()
-	//fmt.Println(t.config.AccessTokenDuration)
-	end := now.Add(t.config.AccessTokenDuration)
 	claims := MyClaims{ // Menyiapkan struct dengan isi yg dibutuhkan
 		StandardClaims: jwt.StandardClaims{
 			Issuer: t.config.AplicationName,
@@ -39,10 +46,21 @@ func (t *token) CreateToken(dataLogin appresponse.LoginResponse) (string, error)
 		Username: dataLogin.Username,
 		Name:     dataLogin.Name,
 	}
-	claims.IssuedAt = now.Unix()
-	claims.ExpiresAt = end.Unix()
 	token := jwt.NewWithClaims(t.config.JwtSignatureMethod, claims) // membuat jwt dengan format method dan claim berupa struct
-	return token.SignedString([]byte(t.config.JwtSignatureKey))     // mendapatkan token
+	tokenString, err := token.SignedString([]byte(t.config.JwtSignatureKey))
+	t.UpdateToken(tokenString)
+	return tokenString, err // mendapatkan token
+}
+
+func (t *token) CheckTokenAvailable(tokenString string) (bool, error) {
+	tokenAuth, err := t.rdb.Get(t.ctx, "token").Result()
+	if err != nil {
+		return false, err
+	}
+	if tokenString != tokenAuth {
+		return false, nil
+	}
+	return true, nil
 }
 
 func (t *token) VerifAccessToken(tokenString string) (jwt.MapClaims, error) {
@@ -61,8 +79,10 @@ func (t *token) VerifAccessToken(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func NewToken(config TokenConfig) Token {
+func NewToken(config TokenConfig, ctx context.Context, rdb *redis.Client) Token {
 	return &token{
 		config,
+		rdb,
+		ctx,
 	}
 }

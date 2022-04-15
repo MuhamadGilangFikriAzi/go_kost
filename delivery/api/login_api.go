@@ -38,10 +38,8 @@ func (l *loginApi) LoginAdmin() gin.HandlerFunc {
 			common_resp.NewCommonResp(c).FailedResp(http.StatusInternalServerError, common_resp.FailedMessage("Token Failed"))
 			return
 		}
-		dataAdmin.Password = ""
 		common_resp.NewCommonResp(c).SuccessResp(http.StatusOK, common_resp.SuccessMessage("login admin", gin.H{
-			"data_admin": dataAdmin,
-			"token":      tokenString,
+			"token": tokenString,
 		}))
 	}
 }
