@@ -9,9 +9,26 @@ import (
 )
 
 type Config struct {
+	ConfigToken  authenticator.Token
+	ConfigServer *ConfigServer
+	*ConfigDatabase
+}
+
+type ConfigDatabase struct {
 	dbConn      string
 	mysqlConn   string
-	ConfigToken authenticator.Token
+	configRedis *ConfigRedis
+}
+
+type ConfigServer struct {
+	Url  string
+	Port string
+}
+
+type ConfigRedis struct {
+	Address  string
+	Password string
+	Db       int
 }
 
 func newTokenConfig() authenticator.Token {
@@ -24,12 +41,23 @@ func newTokenConfig() authenticator.Token {
 	return authenticator.NewToken(tokenConfig)
 }
 
-func (c *Config) MysqlConn() string {
+func newServerConfig() *ConfigServer {
+	return &ConfigServer{
+		GetConfigValue("SERVERURL"),
+		GetConfigValue("SERVERPORT"),
+	}
+}
+
+func (c *ConfigDatabase) MysqlConn() string {
 	return c.mysqlConn
 }
 
-func (c *Config) PostgreConn() string {
+func (c *ConfigDatabase) PostgreConn() string {
 	return c.dbConn
+}
+
+func (c *ConfigDatabase) RedisConfig() *ConfigRedis {
+	return c.configRedis
 }
 
 func ReadConfigFile(configName string) {
@@ -70,10 +98,22 @@ func newMysqlConn() string {
 	return dsn
 }
 
+func newRedisConn() *ConfigRedis {
+	return &ConfigRedis{
+		Address:  fmt.Sprintf("%s:%s", GetConfigValue("REDISURL"), GetConfigValue("REDISPORT")),
+		Password: GetConfigValue("REDISPASSWORD"),
+		Db:       0,
+	}
+}
+
 func NewConfig() *Config {
 	return &Config{
-		dbConn:      newPostgreConn(),
-		ConfigToken: newTokenConfig(),
-		mysqlConn:   newMysqlConn(),
+		ConfigToken:  newTokenConfig(),
+		ConfigServer: newServerConfig(),
+		ConfigDatabase: &ConfigDatabase{
+			newPostgreConn(),
+			newMysqlConn(),
+			newRedisConn(),
+		},
 	}
 }

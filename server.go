@@ -57,14 +57,14 @@ func (s *serverConfig) Run() {
 func Server() AppServer {
 	ginStart := gin.Default()
 	config := config.NewConfig()
-	infra := manager.NewInfraManager(config.PostgreConn(), config.MysqlConn())
+	infra := manager.NewInfraManager(config.ConfigDatabase)
 	repo := manager.NewRepoManager(infra.PostgreConn(), infra.MysqlConn())
 	usecase := manager.NewUseCaseManager(repo)
 	middleware := middleware.NewAuthTokenMiddleware(config.ConfigToken)
 	return &serverConfig{
 		ginStart,
-		"localhost",
-		"8000",
+		config.ConfigServer.Url,
+		config.ConfigServer.Port,
 		infra,
 		repo,
 		usecase,

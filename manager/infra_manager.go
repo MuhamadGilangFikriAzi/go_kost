@@ -1,8 +1,11 @@
 package manager
 
 import (
+	"context"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
+	"gokost.com/m/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"os"
@@ -16,6 +19,8 @@ type InfraManager interface {
 type infraManager struct {
 	postgreConn *sqlx.DB
 	mysqlConn   *gorm.DB
+	redisConn   *redis.Client
+	ctx         context.Context
 }
 
 func (i *infraManager) PostgreConn() *sqlx.DB {
@@ -26,9 +31,18 @@ func (i *infraManager) MysqlConn() *gorm.DB {
 	return i.mysqlConn
 }
 
-func NewInfraManager(urlPostgresql string, urlMysql string) InfraManager {
+func NewInfraManager(configDatabase *config.ConfigDatabase) InfraManager {
+	urlPostgresql := configDatabase.PostgreConn()
+	urlMysql := configDatabase.MysqlConn()
+	redisConfig := configDatabase.RedisConfig()
 	conn, err := sqlx.Connect("pgx", urlPostgresql)
 	connMysql, errMysql := gorm.Open(mysql.Open(urlMysql), &gorm.Config{})
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     redisConfig.Address,
+		Password: redisConfig.Password,
+		DB:       redisConfig.Db,
+	})
+	ctx := context.Background()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
@@ -40,5 +54,7 @@ func NewInfraManager(urlPostgresql string, urlMysql string) InfraManager {
 	return &infraManager{
 		postgreConn: conn,
 		mysqlConn:   connMysql,
+		redisConn:   rdb,
+		ctx:         ctx,
 	}
 }
